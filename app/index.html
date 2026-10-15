@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wordle Dashboard</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Word<span>dle</span> Dashboard</h1>
+  <nav id="tabs">
+    <button data-tab="wordle">Wordle</button>
+    <button data-tab="quordle" class="active">Quordle</button>
+    <button data-tab="octordle">Octordle</button>
+    <button data-tab="assist">Assistente</button>
+    <button data-tab="connections">Connections</button>
+  </nav>
+</header>
+
+<main>
+  <section id="play">
+    <div class="toolbar" id="game-toolbar">
+      <div class="seg" id="seed-mode">
+        <button data-seed="daily" class="active">Giornaliera</button>
+        <button data-seed="free">Libera</button>
+      </div>
+      <button id="new-game" class="btn">Nuova partita</button>
+      <label class="switch"><input type="checkbox" id="help-toggle"> Ottimizzatore</label>
+      <span id="status" class="status"></span>
+    </div>
+
+    <div class="toolbar" id="assist-toolbar" hidden>
+      <label>Board
+        <select id="assist-n">
+          <option value="1">1 (Wordle)</option><option value="2">2 (Dordle)</option>
+          <option value="4" selected>4 (Quordle)</option><option value="8">8 (Octordle)</option>
+          <option value="16">16 (Sedecordle)</option>
+        </select>
+      </label>
+      <label>Tentativi <input type="number" id="assist-max" min="1" max="30" value="9"></label>
+      <label class="switch"><input type="checkbox" id="assist-wide"> Tutte le parole come soluzioni</label>
+      <button id="assist-undo" class="btn">Annulla ultima</button>
+      <button id="assist-reset" class="btn">Reset</button>
+      <span class="hint">Scrivi la parola usata, premi Invio, poi clicca le caselle per impostare i colori (grigio → giallo → verde).</span>
+    </div>
+
+    <div class="layout">
+      <div class="game-col">
+        <div id="boards"></div>
+        <div id="input-preview"></div>
+        <div id="keyboard"></div>
+      </div>
+      <aside id="solver" hidden>
+        <h2>Ottimizzatore</h2>
+        <div id="solver-meta" class="muted"></div>
+        <table id="sugg">
+          <thead><tr><th>#</th><th>Parola</th><th title="Informazione attesa sommata su tutte le board">Bit</th><th title="Numero atteso di board risolte con questo tentativo">P(risolve)</th><th title="Candidati attesi rimanenti, sommati sulle board">Rimanenti</th><th>Board</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <h3>Soluzioni possibili per board</h3>
+        <div id="cands"></div>
+      </aside>
+    </div>
+  </section>
+
+  <section id="conn" hidden>
+    <div class="toolbar">
+      <div class="seg" id="conn-source">
+        <button data-src="daily">Giornaliera</button>
+        <button data-src="random">Casuale</button>
+        <button data-src="archive">Archivio</button>
+        <button data-src="custom">Personalizzato</button>
+      </div>
+      <span id="conn-archive" hidden>#<input type="number" id="conn-num" min="1"> <button id="conn-go" class="btn">Apri</button></span>
+      <button id="conn-new" class="btn" hidden>Nuovo puzzle</button>
+      <button id="conn-edit" class="btn" hidden>Inserisci parole</button>
+      <label class="switch"><input type="checkbox" id="conn-help"> Ottimizzatore</label>
+      <span id="conn-status" class="status"></span>
+    </div>
+    <div id="conn-custom-box" class="panel" hidden>
+      <p class="hint">Incolla le 16 parole del puzzle (una per riga o separate da virgola). Dopo ogni tentativo indicherai il risultato che ti ha dato il gioco.</p>
+      <textarea id="conn-custom-text" rows="6"></textarea>
+      <button id="conn-custom-go" class="btn">Inizia</button>
+    </div>
+    <div class="layout">
+      <div class="conn-col">
+        <div id="conn-solved"></div>
+        <div id="conn-board"></div>
+        <div id="conn-dots"></div>
+        <div id="conn-result" class="panel" hidden>
+          Risultato del tentativo:
+          <button class="btn ok" data-r="ok">Corretto</button>
+          <button class="btn one" data-r="one">Uno di distanza</button>
+          <button class="btn wrong" data-r="wrong">Sbagliato</button>
+          <button class="btn" id="conn-result-cancel">Annulla</button>
+        </div>
+        <div class="conn-actions">
+          <button id="conn-shuffle" class="btn">Mescola</button>
+          <button id="conn-clear" class="btn">Deseleziona</button>
+          <button id="conn-submit" class="btn primary">Invia</button>
+          <button id="conn-reset" class="btn">Ricomincia</button>
+        </div>
+        <div id="conn-history"></div>
+      </div>
+      <aside id="conn-solver" hidden>
+        <h2>Ottimizzatore</h2>
+        <div id="conn-meta" class="muted"></div>
+        <table>
+          <thead><tr><th>#</th><th>Gruppo</th><th title="Probabilità che sia uno dei gruppi corretti">Probabilità</th></tr></thead>
+          <tbody id="conn-sugg"></tbody>
+        </table>
+        <h3>Soluzione completa più probabile</h3>
+        <div id="conn-best"></div>
+        <p class="muted small">Il modello unisce somiglianza semantica (GloVe), gruppi già visti in altri puzzle NYT e i vincoli dei tuoi tentativi. Giochi di parole (anagrammi, parole nascoste, omofoni) gli sfuggono spesso.</p>
+      </aside>
+    </div>
+  </section>
+</main>
+
+<div id="toast"></div>
+<script src="words.js"></script>
+<script src="connections-data.js"></script>
+<script src="connections-ui.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
